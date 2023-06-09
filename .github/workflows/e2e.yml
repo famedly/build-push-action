@@ -23,8 +23,6 @@ on:
       - 'v*'
 
 env:
-  BUILDX_VERSION: latest
-  BUILDKIT_IMAGE: moby/buildkit:buildx-stable-1
   HARBOR_VERSION: v2.7.0
   NEXUS_VERSION: 3.47.1
   DISTRIBUTION_VERSION: 2.8.1
@@ -35,6 +33,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        buildx_version:
+          - latest
+          - https://github.com/docker/buildx.git#master
+        buildkit_image:
+          - moby/buildkit:buildx-stable-1
+          - moby/buildkit:master
         include:
           -
             name: Distribution
@@ -166,11 +170,11 @@ jobs:
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
         with:
-          version: ${{ inputs.buildx-version || env.BUILDX_VERSION }}
+          version: ${{ inputs.buildx-version || matrix.buildx_version }}
           config: /tmp/buildkitd.toml
           buildkitd-flags: --debug --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
           driver-opts: |
-            image=${{ inputs.buildkit-image || env.BUILDKIT_IMAGE }}
+            image=${{ inputs.buildkit-image || matrix.buildkit_image }}
             network=host
       -
         name: Login to Registry
