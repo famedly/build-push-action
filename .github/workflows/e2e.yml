@@ -39,7 +39,8 @@ jobs:
         buildkit_image:
           - moby/buildkit:buildx-stable-1
           - moby/buildkit:master
-        _merge: dummy
+        _merge:
+          - dummy
         include:
           -
             name: Distribution
